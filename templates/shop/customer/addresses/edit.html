@@ -1,0 +1,39 @@
+{% extends 'shop/_layouts/main' %}
+
+{% block main %}
+
+    {% set addressId = craft.app.request.param('addressId') %}
+    {% set redirect = craft.app.request.param('redirect') %}
+
+    {% if not address is defined and addressId %}
+        {% set address = craft.commerce.customers.customer.getAddressById(addressId) %}
+    {% endif %}
+
+    <form method="post">
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="commerce/customer-addresses/save">
+        {% if redirect %}
+            {{ redirectInput(redirect) }}
+        {% else %}
+            {{ redirectInput('shop/customer/addresses') }}
+        {% endif %}
+
+        {% if addressId %}
+            <input type="hidden" name="address[id]" value="{{ addressId }}">
+        {% endif %}
+
+        {% include 'shop/_includes/addresses/form' %}
+        {% set isPrimaryBilling = cart.customer.primaryBillingAddressId == addressId %}
+        {% set isPrimaryShipping = cart.customer.primaryShippingAddressId == addressId %}
+        <label for="makePrimaryShippingAddress"><input id="makePrimaryShippingAddress" name="makePrimaryShippingAddress" type="checkbox" {{ isPrimaryBilling ? 'checked' :'' }}/><span class="label-body">Make this the primary shipping address</span></label>
+        <label for="makePrimaryBillingAddress"><input id="makePrimaryBillingAddress" name="makePrimaryBillingAddress" type="checkbox" {{ isPrimaryShipping ? 'checked' :'' }}/><span class="label-body">Make this the primary billing address</span></label>
+
+        <input type="submit" value="Save Address">
+    </form>
+    {% if redirect %}
+        <a href="/{{ redirect }}">Cancel</a>
+    {% else %}
+        <a href="{{ url('shop/customer/addresses') }}">Cancel</a>
+    {% endif %}
+
+{% endblock %}

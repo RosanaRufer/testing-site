@@ -1,0 +1,29 @@
+
+
+{% if entry is not defined %}
+	{# Entry is not defined because we have a country_code in the URL. See routes.php #}
+	{% set entry = craft.entries.section(section_URI|default('homePage')).one() %}
+	{% do seomatic.helper.loadMetadataForUri(entry.uri) %}
+{% endif %}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+</head>
+
+<body>
+
+{% block body %}
+{% endblock body %}
+
+Selected country code : {{ country_code|default('none') }}
+<br><br>
+Section URI: {{ entry.uri }}
+<br><br>
+SEO Title: {{ seomatic.meta.seoTitle }}
+</body>
+
+</html> 
